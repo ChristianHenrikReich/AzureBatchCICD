@@ -42,8 +42,8 @@ resource "azurerm_batch_pool" "example" {
   node_agent_sku_id   = "batch.node.ubuntu 20.04"
 
   fixed_scale {
-    target_dedicated_nodes    = 0
-    target_low_priority_nodes = 1
+    target_dedicated_nodes    = 1
+    target_low_priority_nodes = 0
   }
 
   storage_image_reference {
