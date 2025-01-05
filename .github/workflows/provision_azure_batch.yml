@@ -25,7 +25,7 @@ jobs:
       working-directory: terraform
 
     - name: Plan Terraform
-      run: terraform plan -out=tfplan
+      run: terraform plan -output=false
       working-directory: terraform
       env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
