@@ -37,7 +37,7 @@ resource "azurerm_batch_pool" "example" {
   name                = local.azure_batch_pool_name
   resource_group_name = azurerm_batch_account.example.resource_group_name
   account_name        = azurerm_batch_account.example.name
-  display_name        = ""
+  display_name        = local.azure_batch_pool_name
   vm_size             = "Standard_B1s"
   node_agent_sku_id   = "batch.node.ubuntu 20.04"
 
