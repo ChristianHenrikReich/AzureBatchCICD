@@ -1,10 +1,12 @@
-terraform {
-  backend "remote" {
-    organization = "protien_compute"
-    workspaces {
-      name = "AzureBatchCICD"
-    }
-  }
+terraform { 
+  cloud { 
+    
+    organization = "protien_compute" 
+
+    workspaces { 
+      name = "protien_state" 
+    } 
+  } 
 }
 
 provider "azurerm" {
