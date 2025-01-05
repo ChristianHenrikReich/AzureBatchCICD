@@ -1,10 +1,19 @@
+terraform {
+  backend "remote" {
+    organization = "protien_compute"
+    workspaces {
+      name = "AzureBatchCICD"
+    }
+  }
+}
+
 provider "azurerm" {
   resource_provider_registrations = "none"
   features {}
 }
 
 locals {
-  resource_group_name = "${var.environment}-${var.project_name}-rg"
+  resource_group_name      = "${var.environment}-${var.project_name}-rg"
   azure_batch_account_name = "${var.environment}${var.project_name}ba001"
 }
 
