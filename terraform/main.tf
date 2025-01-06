@@ -35,23 +35,21 @@ resource "azurerm_batch_account" "example" {
 
 resource "azurerm_batch_pool" "example" {
   name                = local.azure_batch_pool_name
-  resource_group_name = azurerm_batch_account.example.resource_group_name
-  account_name        = azurerm_batch_account.example.name
+  resource_group_name = local.resource_group_name
+  account_name        = local.azure_batch_account_name
   display_name        = local.azure_batch_pool_name
-  vm_size             = "Standard_B1s"
-  node_agent_sku_id   = "batch.node.ubuntu 20.04"
+  vm_size             = "Standard_A1"
+  node_agent_sku_id   = "batch.node.ubuntu 22.04"
 
   fixed_scale {
-    target_dedicated_nodes    = 1
-    target_low_priority_nodes = 0
+    target_dedicated_nodes = 1
+    resize_timeout         = "PT15M"
   }
-
   storage_image_reference {
-    publisher = "microsoft-azure-batch"
-    offer     = "ubuntu-server-container"
-    sku       = "20-04-lts"
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
     version   = "latest"
   }
-
 
 }
