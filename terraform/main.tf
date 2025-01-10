@@ -18,7 +18,7 @@ locals {
   resource_group_name        = "${var.environment}-${var.project_name}-rg"
   azure_storage_account_name = "${var.environment}${var.project_name}st001"
   azure_batch_account_name   = "${var.environment}${var.project_name}ba001"
-  azure_batch_pool_name      = "${var.environment}${var.project_name}ba-pool-001"
+  azure_batch_pool_name      = "${var.environment}${var.project_name}ba001-pool-001"
 }
 
 resource "azurerm_resource_group" "example" {

@@ -34,7 +34,7 @@ jobs:
       run: terraform plan -input=false
       working-directory: terraform
       env:
-        TF_VAR_project_name: ${{ secrets.AZ_BATCH_RESOURCE_GROUP }}
+        TF_VAR_project_name: ${{ secrets.PROJECT }}
         TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Apply Terraform
@@ -42,7 +42,7 @@ jobs:
       run: terraform apply -auto-approve -input=false
       working-directory: terraform
       env:
-        TF_VAR_project_name: ${{ secrets.AZ_BATCH_RESOURCE_GROUP }}
+        TF_VAR_project_name: ${{ secrets.PROJECT }}
         TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Set up Go
@@ -75,8 +75,8 @@ jobs:
       run: |
         zip -r csv_to_parquet.zip csv_to_parquet
         az batch application package create \
-          --resource-group ${{ env.ENVIRONMENT }}-${{ secrets.AZ_BATCH_RESOURCE_GROUP }}-rg \
-          --name ${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001 \
+          --resource-group ${{ env.ENVIRONMENT }}-${{ secrets.PROJECT }}-rg \
+          --name ${{ secrets.PROJECT }}ba001 \
           --application-name python-app \
           --package-file python-app.zip \
           --version-name 1.0
@@ -84,11 +84,11 @@ jobs:
     - name: Create Batch Job
       run: |
         az batch job create \
-          --account-name ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001 \
-          --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001.swedencentral.batch.azure.com \
+          --account-name ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001 \
+          --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001.swedencentral.batch.azure.com \
           --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }} \
           --id ${{ env.JOB_ID }} \
-          --pool-id ${{ secrets.AZ_BATCH_POOL_ID }}
+          --pool-id ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001-pool-001
   
     - name: Create Batch Task
       run: |
@@ -97,6 +97,6 @@ jobs:
           --task-id ${{ env.TASK_ID }} \
           --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet"' \
           --application-package-references "python-app#1.0" \
-          --account-name ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001 \
-          --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001.swedencentral.batch.azure.com \
+          --account-name ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001 \
+          --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001.swedencentral.batch.azure.com \
           --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }}
