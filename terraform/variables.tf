@@ -28,3 +28,25 @@ variable "spot_nodes" {
   description = "Number of spot nodes"
   type        = number
 }
+
+
+variable "node_agent_sku_id" {
+  description = "Azure VM Sku"
+  type        = string
+}
+
+variable "storage_image_reference_publisher" {
+  type        = string
+}
+
+variable "storage_image_reference_offer" {
+  type        = string
+}
+
+variable "storage_image_reference_sku" {
+  type        = string
+}
+
+variable "storage_image_reference_version" {
+  type        = string
+}

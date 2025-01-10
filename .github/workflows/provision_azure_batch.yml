@@ -11,34 +11,34 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # - name: Setup Terraform
-    #   uses: hashicorp/setup-terraform@v2
-    #   with:
-    #     terraform_version: latest
-    #     cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: latest
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    # - name: Initialize Terraform
-    #   run: terraform init
-    #   working-directory: terraform
+    - name: Initialize Terraform
+      run: terraform init
+      working-directory: terraform
 
-    # - name: Plan Terraform
-    #   run: terraform plan -input=false
-    #   working-directory: terraform
-    #   env:
-    #     ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-    #     ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-    #     ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-    #     ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    - name: Plan Terraform
+      run: terraform plan -input=false
+      working-directory: terraform
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-    # - name: Apply Terraform
-    #   if: github.ref == 'refs/heads/main'
-    #   run: terraform apply -auto-approve -input=false
-    #   working-directory: terraform
-    #   env:
-    #     ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-    #     ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-    #     ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-    #     ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    - name: Apply Terraform
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve -input=false
+      working-directory: terraform
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -52,54 +52,54 @@ jobs:
       run: go build -v ./...
 
 
-    # - name: Install Azure CLI
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y zip
-    #     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    - name: Install Azure CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zip
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
   
-    # - name: Login to Azure
-    #   run: |
-    #     az login --service-principal \
-    #       --username ${{ secrets.ARM_CLIENT_ID }} \
-    #       --password ${{ secrets.ARM_CLIENT_SECRET }} \
-    #       --tenant ${{ secrets.ARM_TENANT_ID }}
-    #     az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
+    - name: Login to Azure
+      run: |
+        az login --service-principal \
+          --username ${{ secrets.ARM_CLIENT_ID }} \
+          --password ${{ secrets.ARM_CLIENT_SECRET }} \
+          --tenant ${{ secrets.ARM_TENANT_ID }}
+        az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
   
-    # - name: Generate Random IDs
-    #   id: generate_ids
-    #   run: |
-    #     export JOB_ID="job-$RANDOM"
-    #     export TASK_ID="task-$RANDOM"
-    #     echo "JOB_ID=$JOB_ID" >> $GITHUB_ENV
-    #     echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
+    - name: Generate Random IDs
+      id: generate_ids
+      run: |
+        export JOB_ID="job-$RANDOM"
+        export TASK_ID="task-$RANDOM"
+        echo "JOB_ID=$JOB_ID" >> $GITHUB_ENV
+        echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
   
-    # - name: Create Application Package
-    #   run: |
-    #     zip -r csv_to_parquet.zip csv_to_parquet
-    #     az batch application package create \
-    #       --resource-group ${{ secrets.AZ_BATCH_RESOURCE_GROUP }} \
-    #       --name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
-    #       --application-name python-app \
-    #       --package-file python-app.zip \
-    #       --version-name 1.0
+    - name: Create Application Package
+      run: |
+        zip -r csv_to_parquet.zip csv_to_parquet
+        az batch application package create \
+          --resource-group ${{ secrets.AZ_BATCH_RESOURCE_GROUP }} \
+          --name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
+          --application-name python-app \
+          --package-file python-app.zip \
+          --version-name 1.0
   
-    # - name: Create Batch Job
-    #   run: |
-    #     az batch job create \
-    #       --account-name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
-    #       --account-endpoint ${{ secrets.AZ_BATCH_ACCOUNT_ENDPOINT }} \
-    #       --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }} \
-    #       --id ${{ env.JOB_ID }} \
-    #       --pool-id ${{ secrets.AZ_BATCH_POOL_ID }}
+    - name: Create Batch Job
+      run: |
+        az batch job create \
+          --account-name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
+          --account-endpoint ${{ secrets.AZ_BATCH_ACCOUNT_ENDPOINT }} \
+          --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }} \
+          --id ${{ env.JOB_ID }} \
+          --pool-id ${{ secrets.AZ_BATCH_POOL_ID }}
   
-    # - name: Create Batch Task
-    #   run: |
-    #     az batch task create \
-    #       --job-id ${{ env.JOB_ID }} \
-    #       --task-id ${{ env.TASK_ID }} \
-    #       --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet"' \
-    #       --application-package-references "python-app#1.0" \
-    #       --account-name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
-    #       --account-endpoint ${{ secrets.AZ_BATCH_ACCOUNT_ENDPOINT }} \
-    #       --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }}
+    - name: Create Batch Task
+      run: |
+        az batch task create \
+          --job-id ${{ env.JOB_ID }} \
+          --task-id ${{ env.TASK_ID }} \
+          --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet"' \
+          --application-package-references "python-app#1.0" \
+          --account-name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
+          --account-endpoint ${{ secrets.AZ_BATCH_ACCOUNT_ENDPOINT }} \
+          --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }}
