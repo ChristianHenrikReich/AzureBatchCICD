@@ -11,6 +11,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Generate Random IDs
+      id: generate_ids
+      run: |
+        export JOB_ID="job-$RANDOM"
+        export TASK_ID="task-$RANDOM"
+        echo "JOB_ID=$JOB_ID" >> $GITHUB_ENV
+        echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
+        echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
@@ -25,20 +34,16 @@ jobs:
       run: terraform plan -input=false
       working-directory: terraform
       env:
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_VAR_project_name: ${{ secrets.AZ_BATCH_RESOURCE_GROUP }}
+        TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Apply Terraform
       if: github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve -input=false
       working-directory: terraform
       env:
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_VAR_project_name: ${{ secrets.AZ_BATCH_RESOURCE_GROUP }}
+        TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -66,20 +71,12 @@ jobs:
           --tenant ${{ secrets.ARM_TENANT_ID }}
         az account set --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
   
-    - name: Generate Random IDs
-      id: generate_ids
-      run: |
-        export JOB_ID="job-$RANDOM"
-        export TASK_ID="task-$RANDOM"
-        echo "JOB_ID=$JOB_ID" >> $GITHUB_ENV
-        echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
-  
     - name: Create Application Package
       run: |
         zip -r csv_to_parquet.zip csv_to_parquet
         az batch application package create \
-          --resource-group ${{ secrets.AZ_BATCH_RESOURCE_GROUP }} \
-          --name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
+          --resource-group ${{ env.ENVIRONMENT }}-${{ secrets.AZ_BATCH_RESOURCE_GROUP }}-rg \
+          --name ${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001 \
           --application-name python-app \
           --package-file python-app.zip \
           --version-name 1.0
@@ -87,8 +84,8 @@ jobs:
     - name: Create Batch Job
       run: |
         az batch job create \
-          --account-name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
-          --account-endpoint ${{ secrets.AZ_BATCH_ACCOUNT_ENDPOINT }} \
+          --account-name ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001 \
+          --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001.swedencentral.batch.azure.com \
           --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }} \
           --id ${{ env.JOB_ID }} \
           --pool-id ${{ secrets.AZ_BATCH_POOL_ID }}
@@ -100,6 +97,6 @@ jobs:
           --task-id ${{ env.TASK_ID }} \
           --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet"' \
           --application-package-references "python-app#1.0" \
-          --account-name ${{ secrets.AZ_BATCH_ACCOUNT_NAME }} \
-          --account-endpoint ${{ secrets.AZ_BATCH_ACCOUNT_ENDPOINT }} \
+          --account-name ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001 \
+          --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.AZ_BATCH_RESOURCE_GROUP }}ba001.swedencentral.batch.azure.com \
           --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }}
