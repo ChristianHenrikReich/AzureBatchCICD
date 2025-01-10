@@ -1,6 +1,6 @@
-project_name = "azbhpc"
+project_name = ""
 location = "Sweden Central"
-environment = "dev"
+environment = ""
 
 vm_sku = "Standard_A1_v2"
 nodes = 0
