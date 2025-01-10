@@ -90,7 +90,7 @@ jobs:
           --job-id ${{ env.JOB_ID }} \
           --task-id ${{ env.TASK_ID }} \
           --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet"' \
-          --application-package-references "python-app#1.0" \
+          --application-package-references "csv_to_parquet#1.0" \
           --account-name ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001 \
           --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001.swedencentral.batch.azure.com \
           --account-key ${{ secrets.AZ_BATCH_ACCOUNT_KEY }}
