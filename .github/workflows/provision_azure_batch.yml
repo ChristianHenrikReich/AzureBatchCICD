@@ -75,8 +75,8 @@ jobs:
       run: |
         zip -r csv_to_parquet.zip csv_to_parquet
         az batch application package create \
-          --resource-group ${{ env.ENVIRONMENT }}-${{ secrets.PROJECT }}-rg \
-          --name ${{ secrets.PROJECT }}ba001 \
+          --resource-group ${{ env.ENVIRONMENT }}<-${{ secrets.PROJECT }}-rg \
+          --name ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001 \
           --application-name python-app \
           --package-file python-app.zip \
           --version-name 1.0
