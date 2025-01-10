@@ -31,19 +31,13 @@ jobs:
       working-directory: terraform
 
     - name: Plan Terraform
-      run: terraform plan -input=false
+      run: terraform plan -input=false -var="project_name=${{ secrets.PROJECT }}" -var="environment=${{ env.ENVIRONMENT }}"
       working-directory: terraform
-      env:
-        TF_VAR_project_name: ${{ secrets.PROJECT }}
-        TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Apply Terraform
       if: github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve -input=false
+      run: terraform apply -auto-approve -input=false -var="project_name=${{ secrets.PROJECT }}" -var="environment=${{ env.ENVIRONMENT }}"
       working-directory: terraform
-      env:
-        TF_VAR_project_name: ${{ secrets.PROJECT }}
-        TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Set up Go
       uses: actions/setup-go@v3
