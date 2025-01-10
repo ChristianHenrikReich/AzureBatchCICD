@@ -3,8 +3,8 @@ location = "Sweden Central"
 environment = ""
 
 vm_sku = "Standard_A1_v2"
-nodes = 0
-spot_nodes =  1
+nodes = 1
+spot_nodes =  0
 
 node_agent_sku_id = "batch.node.ubuntu 24.04"
 storage_image_reference_publisher = "Canonical"
