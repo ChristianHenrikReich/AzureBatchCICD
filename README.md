@@ -10,7 +10,7 @@ Provision of Azure resources is done with Terraform.
 Configurations of VM Sizes and count, can be done in the tfvar file: https://github.com/ChristianHenrikReich/AzureBatchCICD/blob/main/terraform/terraform.tfvars
 
 ## Code
-It is an example of how to write the code in Go. Feel free to use any language, Go was chosen because
+It is an example of how to write the code in Go. The example reads a CSV and writes a Parquet. Feel free to use any language, Go was chosen because
 it compiles to one binary file.
 
 To build an Application Package, create a zip file and use az cli, Python or C# to deploy it.
