@@ -67,7 +67,7 @@ jobs:
   
     - name: Create Application Package
       run: |
-        zip -r csv_to_parquet.zip csv_to_parquet
+        zip -r csv_to_parquet.zip csv_to_parquet example.csv
         az batch application package create \
           --resource-group ${{ env.ENVIRONMENT }}-${{ secrets.PROJECT }}-rg \
           --name ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001 \
@@ -89,7 +89,7 @@ jobs:
         az batch task create \
           --job-id ${{ env.JOB_ID }} \
           --task-id ${{ env.TASK_ID }} \
-          --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet"' \
+          --command-line '/bin/bash -c "$AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet -input $AZ_BATCH_APP_PACKAGE_csv_to_parquet_1_0/csv_to_parquet -output /example.parquet"' \
           --application-package-references "csv_to_parquet#1.0" \
           --account-name ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001 \
           --account-endpoint ${{ env.ENVIRONMENT }}${{ secrets.PROJECT }}ba001.swedencentral.batch.azure.com \
